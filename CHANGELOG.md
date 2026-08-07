@@ -1,5 +1,23 @@
 # Pure Minima — Changelog
 
+## [1.0.108] — 2026-08-07
+
+### Added
+
+- **`rawtxnfrom` command** (`send/wallet/rawtxnfrom.hpp/cpp`) — Create an unsigned transaction from raw inputs, outputs, scripts and state. Ported from Java Minima. Orchestrates `txncreate` → `txninput`/`txnoutput`/`txnscript`/`txnstate` → `txnexport` → `txndelete` via nested `runSingleCommand`.
+- **`createtokenfrom` command** (`send/wallet/createtokenfrom.hpp/cpp`) — Create a new token and transaction from a fromaddress/privatekey. Ported from Java Minima. Validates decimals (≤16) and total supply (≤ 1 trillion); builds the token+coin, signs and posts. `sphincs` remains intentionally unsupported (no SPHINCS+ crypto in the codebase; TreeKey/Winternitz-only), so the `sphincs` command is not registered.
+
+### Fixed (MEDIUM)
+
+- **Command error messages serialized as empty (`"error":}`)** — `runMultiCommand` stored `cexc.what()` (a `const char*`) into the `std::any` error value; the pointer dangles once the caught exception object dies, so by the time the response is serialized the error value reads as empty. Now stored as `std::string`. This had silently swallowed the error text of every failed command (RPC and CLI).
+- **`getJSONObjectParam`/`getJSONArrayParam` rejected parsed params** — the JSON parser stores object/array params as `std::shared_ptr<JSONObject>`/`std::shared_ptr<JSONArray>`, but the accessors only accepted value or raw-pointer forms, throwing `param 'x' is not a JSONObject/JSONArray`. This broke any command taking JSON params (e.g. `rawfrom`, and blocked the new `rawtxnfrom`/`createtokenfrom`). Added shared-ptr handling. Fixes the pre-existing `rawfrom` command as a side effect.
+
+### Fixed (CRITICAL)
+
+- **Node crash on exit (`MESSAGE PROCESSING ERROR @ P2P_INIT / mutex lock failed` / `Pure virtual function called`)** — the CLI-exit path in `minima.cpp` destroyed the `Main` instance while the P2P message thread could still be mid-`init()`; `~P2PManager` then destroyed its members before `MessageProcessor` joined the thread (use-after-free). `minima.cpp` now shuts the Main instance down before `main_instance` is destroyed, and `~P2PManager` stops/joins the message thread before members are freed.
+
+---
+
 ## [1.0.107] — 2026-08-07
 
 ### Fixed (CRITICAL)

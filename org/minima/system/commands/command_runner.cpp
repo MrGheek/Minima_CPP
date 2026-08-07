@@ -123,8 +123,10 @@
 #include "org/minima/system/commands/send/wallet/consolidatefrom.hpp"
 #include "org/minima/system/commands/send/wallet/constructfrom.hpp"
 #include "org/minima/system/commands/send/wallet/createfrom.hpp"
+#include "org/minima/system/commands/send/wallet/createtokenfrom.hpp"
 #include "org/minima/system/commands/send/wallet/postfrom.hpp"
 #include "org/minima/system/commands/send/wallet/rawfrom.hpp"
+#include "org/minima/system/commands/send/wallet/rawtxnfrom.hpp"
 #include "org/minima/system/commands/send/wallet/sendfrom.hpp"
 #include "org/minima/system/commands/send/wallet/signfrom.hpp"
 
@@ -220,7 +222,7 @@ std::unique_ptr<JSONArray> CommandRunner::runMultiCommand(const std::string& zMi
             } catch (const CommandException& cexc) {
                 result = cmd->getJSONReply();
                 result->put("status", false);
-                result->put("error", cexc.what());
+                result->put("error", std::string(cexc.what()));
             } catch (const std::exception& exc) {
                 org::minima::utils::MinimaLogger::log(exc);
                 result = cmd->getJSONReply();
@@ -440,6 +442,8 @@ std::vector<std::unique_ptr<Command>>& CommandRunner::getPrototypes() {
         s_protos.push_back(std::make_unique<wallet::sendfrom>());
         s_protos.push_back(std::make_unique<wallet::createfrom>());
         s_protos.push_back(std::make_unique<wallet::rawfrom>());
+        s_protos.push_back(std::make_unique<wallet::rawtxnfrom>());
+        s_protos.push_back(std::make_unique<wallet::createtokenfrom>());
         s_protos.push_back(std::make_unique<wallet::signfrom>());
         s_protos.push_back(std::make_unique<wallet::postfrom>());
         s_protos.push_back(std::make_unique<wallet::constructfrom>());

@@ -350,6 +350,16 @@ void Minima::main(const std::vector<std::string>& zArgs) {
         }
         org::minima::utils::MinimaLogger::log("Minima CLI input stopped.. ", false);
 
+        // Graceful shutdown BEFORE the Main instance below is destroyed. The atexit hook
+        // also calls shutdown, but it runs after main_instance has already been destroyed,
+        // which can tear down network threads mid-processing (e.g. P2P_INIT) and abort
+        // with 'mutex lock failed' / 'Pure virtual function called'.
+        org::minima::system::Main* mo2 = org::minima::system::Main::getInstance();
+        if (mo2 && !mo2->isShuttingDown()) {
+            org::minima::utils::MinimaLogger::log("[!] Shutdown on CLI exit..");
+            mo2->shutdown();
+        }
+
     } catch (const ParamConfigurer::UnknownArgumentException& ex) {
         std::cerr << "[CRASH] UnknownArgumentException: " << ex.what() << std::endl;
         std::cout << ex.what() << std::endl;

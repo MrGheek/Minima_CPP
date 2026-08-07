@@ -111,7 +111,19 @@ P2PManager::P2PManager()
     startMessageProcessorThread();
 }
 
-P2PManager::~P2PManager() = default;
+P2PManager::~P2PManager() {
+    // Stop the message processor thread BEFORE this object's members are destroyed.
+    // The base MessageProcessor destructor only joins the thread after the derived
+    // members (mState, mPeersChecker, ...) have already been freed. If the thread is
+    // still processing a message (e.g. P2P_INIT during a fast shutdown), it would
+    // touch freed memory and fail with e.g. 'mutex lock failed: Invalid argument'.
+    try {
+        stopMessageProcessor();
+        waitToShutDown();
+    } catch (...) {
+        // Never throw from a destructor
+    }
+}
 
 P2PPeersChecker* P2PManager::getPeersChecker() {
     return mPeersChecker.get();

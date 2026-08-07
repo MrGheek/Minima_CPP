@@ -241,6 +241,15 @@ std::unique_ptr<JSONObject> Command::getJSONObjectParam(const std::string& zPara
              throw CommandException("param '" + zParamName + "' holds a null JSONObject pointer");
         }
     }
+    // Check if it holds a std::shared_ptr<JSONObject> (common storage form)
+    else if (aval.type() == typeid(std::shared_ptr<JSONObject>)) {
+        const auto sp = std::any_cast<const std::shared_ptr<JSONObject>&>(aval);
+        if (sp) {
+            return std::make_unique<JSONObject>(*sp); // Copy construct
+        } else {
+            throw CommandException("param '" + zParamName + "' holds a null JSONObject shared_ptr");
+        }
+    }
 
     // Type mismatch
      throw CommandException("param '" + zParamName + "' is not a JSONObject");
@@ -273,6 +282,13 @@ std::unique_ptr<JSONArray> Command::getJSONArrayParam(const std::string& zParamN
             return std::make_unique<JSONArray>(*arr_ptr); // Copy
         } else {
              throw CommandException("param '" + zParamName + "' holds a null JSONArray pointer");
+        }
+    } else if (aval.type() == typeid(std::shared_ptr<JSONArray>)) {
+        const auto sp = std::any_cast<const std::shared_ptr<JSONArray>&>(aval);
+        if (sp) {
+            return std::make_unique<JSONArray>(*sp); // Copy
+        } else {
+            throw CommandException("param '" + zParamName + "' holds a null JSONArray shared_ptr");
         }
     }
 

@@ -2,9 +2,9 @@
 
 ## Summary
 
-This document describes all security vulnerabilities identified and fixed in the Pure Minima C++ codebase as of 2026-08-07 (v1.0.107).
+This document describes all security vulnerabilities identified and fixed in the Pure Minima C++ codebase as of 2026-08-07 (v1.0.108).
 
-**Total: 40 CRITICAL/HIGH vulnerabilities fixed across 5 releases, plus MEDIUM/LOW hardening, a CRITICAL JSON-parser restoration (v1.0.106), and a CRITICAL P2P JSON-handling fix discovered during mainnet testing (v1.0.107).**
+**Total: 40 CRITICAL/HIGH vulnerabilities fixed across 5 releases, plus MEDIUM/LOW hardening, a CRITICAL JSON-parser restoration (v1.0.106), a CRITICAL P2P JSON-handling fix discovered during mainnet testing (v1.0.107), and a CRITICAL shutdown use-after-free + MEDIUM dangling-pointer fix (v1.0.108).**
 
 ## Reporting a Vulnerability
 
@@ -18,6 +18,26 @@ finding publicly until a fix has been released and documented in this file.
 ---
 
 ## Fixed Vulnerabilities
+
+### v1.0.108 — Shutdown Use-After-Free + Command Error Serialization (2 fixes)
+
+#### CRITICAL
+
+##### 55. Node Crash on Exit — P2P Shutdown Race (use-after-free)
+**Problem:** Launching with stdin closed (or any fast shutdown) destroyed the `Main` instance while the P2P message thread could still be inside `init()`. `P2PManager::~P2PManager()` was `= default`, so the derived members (`mState`, `mPeersChecker`, …) were destroyed before the base `MessageProcessor` destructor joined the thread. The thread then touched freed members — observed as `MESSAGE PROCESSING ERROR @ P2P_INIT / mutex lock failed: Invalid argument` and, after partial fixes, `Pure virtual function called!` (`libc++abi` abort).
+**Fix:**
+- `org/minima/minima.cpp` — the CLI-exit path now calls `Main::shutdown()` *before* `main_instance` is destroyed (the `atexit` hook ran too late).
+- `org/minima/system/network/p2p/p2_p_manager.cpp` — `~P2PManager()` now calls `stopMessageProcessor()` + `waitToShutDown()` (in a `try/catch`) before any members are freed.
+**Impact:** Exit with closed stdin is now clean (`Shut down completed OK..`, `Main Instance Cleared..`); verified with zero crash markers.
+
+#### MEDIUM
+
+##### 56. Command Error Messages Serialized Empty — Dangling `const char*` in `std::any`
+**Problem:** `CommandRunner::runMultiCommand` stored `cexc.what()` — a raw `const char*` — into the `std::any` error value. The pointer dangled once the caught exception object died at the end of the `catch` block, and by the time the response was serialized (RPC or CLI) it read freed memory as empty: `"error":}`. Every failed command silently lost its error text.
+**Fix:** `command_runner.cpp` now stores `std::string(cexc.what())`. Also hardened `Command::getJSONObjectParam`/`getJSONArrayParam` to accept the `shared_ptr` storage form used by the JSON parser, which unblocked commands taking JSON params (`rawfrom`, and the newly ported `rawtxnfrom`/`createtokenfrom`).
+**Impact:** Commands now report real error messages (e.g. `"error":"param not specified : id"`), and JSON-param commands execute correctly.
+
+---
 
 ### v1.0.107 — P2P JSON Message Handling Fix + Mainnet Bootstrap (2 fixes)
 

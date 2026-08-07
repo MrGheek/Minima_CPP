@@ -243,8 +243,10 @@ add_executable(minima
     org/minima/system/commands/send/wallet/consolidatefrom.cpp
     org/minima/system/commands/send/wallet/constructfrom.cpp
     org/minima/system/commands/send/wallet/createfrom.cpp
+    org/minima/system/commands/send/wallet/createtokenfrom.cpp
     org/minima/system/commands/send/wallet/postfrom.cpp
     org/minima/system/commands/send/wallet/rawfrom.cpp
+    org/minima/system/commands/send/wallet/rawtxnfrom.cpp
     org/minima/system/commands/send/wallet/sendfrom.cpp
     org/minima/system/commands/send/wallet/signfrom.cpp
     org/minima/system/commands/sendpoll/send_poll_manager.cpp
