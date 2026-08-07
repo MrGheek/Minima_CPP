@@ -5,6 +5,7 @@
 #include <unordered_map>
 #include <unordered_set>
 #include <mutex>
+#include <vector>
 #include <cstdint>
 
 // Forward declarations (namespaced per Pitfall 10)
