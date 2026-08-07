@@ -14,8 +14,9 @@ build_mainnet/
 /g++
 APP/WSL/minima
 
-# Test binaries
+# Test binaries (but not source files)
 tests/test_*
+!tests/test_*.cpp
 
 # Database / wallet files (runtime)
 *.db
