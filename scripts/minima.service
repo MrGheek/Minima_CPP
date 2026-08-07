@@ -1,0 +1,14 @@
+[Unit]
+Description=Pure Minima Node
+After=network.target
+
+[Service]
+Type=simple
+ExecStart=/usr/local/bin/minima -daemon -rpcenable
+Restart=on-failure
+RestartSec=10
+User=minima
+LimitNOFILE=65536
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,18 @@
+version: "3.8"
+services:
+  minima:
+    build: .
+    ports:
+      - "9001:9001"
+      - "9003:9003"
+      - "9005:9005"
+    volumes:
+      - minima_data:/root/.minima
+    environment:
+      - MINIMA_RPCENABLE=true
+      - MINIMA_MDSENABLE=true
+      - MINIMA_MDSPASSWORD=changeme
+    restart: unless-stopped
+
+volumes:
+  minima_data:

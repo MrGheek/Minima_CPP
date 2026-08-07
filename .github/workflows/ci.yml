@@ -1,0 +1,39 @@
+name: CI
+on: [push, pull_request]
+jobs:
+  build:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install dependencies (Linux)
+        if: runner.os == 'Linux'
+        run: sudo apt-get update && sudo apt-get install -y libsqlite3-dev libssl-dev zlib1g-dev libcurl4-openssl-dev
+
+      - name: Install dependencies (macOS)
+        if: runner.os == 'macOS'
+        run: brew install sqlite3 openssl zlib curl
+
+      - name: Configure
+        run: cmake -B build -DCMAKE_BUILD_TYPE=Release
+
+      - name: Build
+        run: cmake --build build -j$(nproc)
+
+      - name: Run Winternitz test
+        run: |
+          cmake --build build --target test_winternitz
+          ./build/test_winternitz
+
+      - name: Run SHA3 test
+        run: |
+          g++ -std=c++17 -o build/test_sha3 tests/test_sha3.cpp -I/opt/homebrew/opt/openssl@3/include -L/opt/homebrew/opt/openssl@3/lib -lssl -lcrypto
+          ./build/test_sha3
+
+      - name: Run serialization test
+        run: |
+          cmake --build build --target test_serialization
+          ./build/test_serialization
