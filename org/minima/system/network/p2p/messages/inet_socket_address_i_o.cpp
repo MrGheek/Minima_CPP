@@ -4,6 +4,7 @@
 #include <mutex>
 #include <vector>
 #include <cstdlib>
+#include <memory>
 
 #ifdef _WIN32
 //   #define NOMINMAX
