@@ -14,6 +14,7 @@
 #include <string>
 #include <cstring>
 #include <iomanip>
+#include <functional>
 #include <openssl/evp.h>
 #include <openssl/rand.h>
 
