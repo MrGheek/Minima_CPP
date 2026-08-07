@@ -21,7 +21,7 @@ jobs:
         run: cmake -B build -DCMAKE_BUILD_TYPE=Release
 
       - name: Build
-        run: cmake --build build -j$(nproc)
+        run: cmake --build build -j$(nproc 2>/dev/null || sysctl -n hw.logicalcpu)
 
       - name: Run Winternitz test
         run: |
