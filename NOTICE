@@ -1,6 +1,8 @@
 Pure Minima C++
 ================
 
+Copyright 2026 Minima C++ Contributors
+
 This is a C++17 translation of the Minima blockchain node, derived from the
 original Java implementation:
 
