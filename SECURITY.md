@@ -6,6 +6,15 @@ This document describes all security vulnerabilities identified and fixed in the
 
 **Total: 40 CRITICAL/HIGH vulnerabilities fixed across 5 releases, plus MEDIUM/LOW hardening, a CRITICAL JSON-parser restoration (v1.0.106), and a CRITICAL P2P JSON-handling fix discovered during mainnet testing (v1.0.107).**
 
+## Reporting a Vulnerability
+
+Security vulnerabilities should be reported privately. Please open a GitHub
+Security Advisory on this repository, or contact the repository owner directly.
+Do not file public issues for security findings. Please include the affected
+file(s) and a minimal reproduction if possible. You can expect an initial
+acknowledgement within 3 business days. We ask that you do not disclose the
+finding publicly until a fix has been released and documented in this file.
+
 ---
 
 ## Fixed Vulnerabilities

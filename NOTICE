@@ -1,0 +1,28 @@
+Pure Minima C++
+================
+
+This is a C++17 translation of the Minima blockchain node, derived from the
+original Java implementation:
+
+    The Minima protocol Java libraries and application
+    Copyright (c) Minima Global
+    https://github.com/minima-global/Minima
+
+Both the original work and this translation are licensed under the
+Apache License, Version 2.0. See LICENSE for the full license text.
+
+Changes made by the authors of this translation (relative to the original
+Java codebase) are documented in CHANGELOG.md. This translation removes
+functionality that is not required for a core node (notably the MDS
+MiniDAPP system and the Maxima messaging layer), retains the Maxima
+wire-protocol message handlers for peer compatibility, and adds security
+hardening documented in SECURITY.md.
+
+This product includes software developed by Minima Global
+(http://www.minima.global/).
+
+This product includes JSON parsing derived from the json-simple library
+(https://github.com/fangyidong/json-simple), Apache License 2.0.
+
+This product includes software developed by the Apache Software Foundation
+(http://www.apache.org/).

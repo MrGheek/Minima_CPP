@@ -219,4 +219,9 @@ org/minima/
 
 ## License
 
-See the original Minima project for license details.
+Licensed under the [Apache License, Version 2.0](LICENSE). This is a C++17
+translation of the Minima node; the original Java implementation is
+[Minima Global / Minima](https://github.com/minima-global/Minima), also
+Apache-2.0. See [NOTICE](NOTICE) for attribution. See
+[CONTRIBUTING.md](CONTRIBUTING.md) and [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md)
+for contribution guidelines.
