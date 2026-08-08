@@ -1,0 +1,27 @@
+name: Configure and build
+description: Configure CMake and build the node and test binaries.
+# Prerequisite: ccache must be installed and on PATH (see the ccache-action
+# step in the calling workflow) - the compiler launcher flag below needs it.
+
+runs:
+  using: composite
+  steps:
+    - name: Configure CMake
+      shell: bash
+      run: |
+        cmake -B build \
+          -DCMAKE_BUILD_TYPE=Release \
+          -DCMAKE_C_COMPILER_LAUNCHER=ccache \
+          -DCMAKE_CXX_COMPILER_LAUNCHER=ccache
+
+    - name: Build node
+      shell: bash
+      run: |
+        if command -v nproc >/dev/null 2>&1; then PARALLEL=$(nproc); else PARALLEL=$(sysctl -n hw.ncpu); fi
+        cmake --build build --target minima -j"${PARALLEL}"
+
+    - name: Build tests
+      shell: bash
+      run: |
+        if command -v nproc >/dev/null 2>&1; then PARALLEL=$(nproc); else PARALLEL=$(sysctl -n hw.ncpu); fi
+        cmake --build build --target test_winternitz test_sha3 test_serialization -j"${PARALLEL}"

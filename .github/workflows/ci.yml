@@ -1,39 +1,31 @@
 name: CI
 on: [push, pull_request]
+
+# Cancel superseded runs on the same ref to avoid wasting minutes on
+# outdated commits (e.g. rapid pushes to a PR branch).
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   build:
     strategy:
+      fail-fast: false
       matrix:
         os: [ubuntu-latest, macos-latest]
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
 
-      - name: Install dependencies (Linux)
-        if: runner.os == 'Linux'
-        run: sudo apt-get update && sudo apt-get install -y libsqlite3-dev libssl-dev zlib1g-dev libcurl4-openssl-dev libboost-dev
+      - uses: ./.github/actions/install-deps
 
-      - name: Install dependencies (macOS)
-        if: runner.os == 'macOS'
-        run: brew install sqlite3 openssl zlib curl boost
+      # ccache: stable key + timestamped saves => cache is shared across all
+      # branches and PRs, so only changed files are recompiled on each run.
+      - uses: hendrikmuhs/ccache-action@v1.2
+        with:
+          key: ccache-${{ matrix.os }}
+          max-size: 2G
 
-      - name: Configure
-        run: cmake -B build -DCMAKE_BUILD_TYPE=Release
+      - uses: ./.github/actions/build-node
 
-      - name: Build
-        run: cmake --build build -j$(nproc)
-
-      - name: Run Winternitz test
-        run: |
-          cmake --build build --target test_winternitz
-          ./build/test_winternitz
-
-      - name: Run SHA3 test
-        run: |
-          cmake --build build --target test_sha3
-          ./build/test_sha3
-
-      - name: Run serialization test
-        run: |
-          cmake --build build --target test_serialization
-          ./build/test_serialization
+      - uses: ./.github/actions/run-tests

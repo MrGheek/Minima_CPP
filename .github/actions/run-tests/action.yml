@@ -1,0 +1,17 @@
+name: Run tests
+description: Run the Winternitz, SHA3 and serialization test binaries
+
+runs:
+  using: composite
+  steps:
+    - name: Winternitz OTS
+      shell: bash
+      run: ./build/test_winternitz
+
+    - name: SHA3-256
+      shell: bash
+      run: ./build/test_sha3
+
+    - name: Serialization parity
+      shell: bash
+      run: ./build/test_serialization
