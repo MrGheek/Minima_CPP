@@ -16,6 +16,16 @@
 
 - **Node crash on exit (`MESSAGE PROCESSING ERROR @ P2P_INIT / mutex lock failed` / `Pure virtual function called`)** — the CLI-exit path in `minima.cpp` destroyed the `Main` instance while the P2P message thread could still be mid-`init()`; `~P2PManager` then destroyed its members before `MessageProcessor` joined the thread (use-after-free). `minima.cpp` now shuts the Main instance down before `main_instance` is destroyed, and `~P2PManager` stops/joins the message thread before members are freed.
 
+### CI / Releases
+
+- **Binary release workflow added** (`.github/workflows/release.yml`) — previously CI only built and tested; there was no release pipeline. Now a `v*` tag push (or manual "Run workflow" dispatch with a `tag` input) builds Release binaries on `ubuntu-latest` and `macos-latest`, runs all three test suites, then attaches `minima-<os>-<arch>` binaries with SHA-256 checksums to a GitHub Release (auto-generated release notes).
+- **CI minutes reduced** — the old `ci.yml` compiled every target (including `benchmark_minima`) from scratch on every push and PR:
+  - `ccache` (stable shared key + timestamped saves) so compiled objects are reused across branches/PRs and only changed files recompile.
+  - Builds only `minima` + the three test binaries (benchmark no longer built in CI).
+  - `concurrency` group cancels superseded runs on the same ref.
+  - `brew install --quiet` for dependencies.
+- **Custom composite actions** (`.github/actions/{install-deps,build-node,run-tests}/action.yml`) — shared by both `ci.yml` and `release.yml` so install/build/test logic is defined once. The `ccache-action` step stays at the workflow level because composite actions don't reliably run nested post-steps (the cache-save hook).
+
 ---
 
 ## [1.0.107] — 2026-08-07
