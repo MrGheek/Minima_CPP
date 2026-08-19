@@ -7,7 +7,7 @@ namespace params {
 
 // Versioning
 std::string GlobalParams::MINIMA_BASE_VERSION = "1.0";
-std::string GlobalParams::MINIMA_BUILD_NUMBER = "100";
+std::string GlobalParams::MINIMA_BUILD_NUMBER = "108";
 std::string GlobalParams::MINIMA_VERSION = GlobalParams::MINIMA_BASE_VERSION + std::string(".") + GlobalParams::MINIMA_BUILD_NUMBER;
 
 // Micro build

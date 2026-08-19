@@ -18,6 +18,7 @@
 
 ### CI / Releases
 
+- **Node version now self-reports v1.0.108.0** — `MINIMA_BUILD_NUMBER` in `global_params.cpp` bumped from `100` to `108` so `status` and the P2P greeting report the released version (peer compatibility only checks the `1.0` base prefix, so this is safe).
 - **Binary release workflow added** (`.github/workflows/release.yml`) — previously CI only built and tested; there was no release pipeline. Now a `v*` tag push (or manual "Run workflow" dispatch with a `tag` input) builds Release binaries on `ubuntu-latest` and `macos-latest`, runs all three test suites, then attaches `minima-<os>-<arch>` binaries with SHA-256 checksums to a GitHub Release (auto-generated release notes).
 - **CI minutes reduced** — the old `ci.yml` compiled every target (including `benchmark_minima`) from scratch on every push and PR:
   - `ccache` (stable shared key + timestamped saves) so compiled objects are reused across branches/PRs and only changed files recompile.
