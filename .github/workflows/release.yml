@@ -54,6 +54,9 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
     if: startsWith(github.ref, 'refs/tags/') || (github.event_name == 'workflow_dispatch' && inputs.tag != '')
+    # Repo default token is read-only; publishing the release needs write.
+    permissions:
+      contents: write
     steps:
       - uses: actions/download-artifact@v4
         with:
